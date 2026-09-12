@@ -38,7 +38,7 @@ class NotifierService:
         return [
             [
                 {
-                    "text": "🚀 ورود به Mini App",
+                    "text": "🚀 Open Mini App",
                     "url": self.settings.mini_app_url,
                 }
             ]
@@ -64,22 +64,9 @@ class NotifierService:
 
         link = self.referral_link(referral_code)
 
-        if self.settings.message_language == "fa":
-            share_text = (
-                "به AI POLIFY بپیوند و "
-                "با لینک Referral من شروع کن"
-            )
-
-            share_button = "👥 ارسال لینک دعوت"
-            app_button = "🚀 ورود به Mini App"
-
-        else:
-            share_text = (
-                "Join AI POLIFY with my referral link"
-            )
-
-            share_button = "👥 Share referral link"
-            app_button = "🚀 Open Mini App"
+        share_text = "Join AI POLIFY with my referral link"
+        share_button = "👥 Share referral link"
+        app_button = "🚀 Open Mini App"
 
         share_url = (
             "https://t.me/share/url"
@@ -103,27 +90,15 @@ class NotifierService:
         ]
 
     def timer_message(self) -> str:
-
-        if self.settings.message_language == "fa":
-            return (
-                "⛏️ تایمر Mining تمام شد!\n\n"
-                "یک ساعت کامل شد.\n"
-                "وارد برنامه شو و روی "
-                "«Claim 100 EPL» بزن تا "
-                "100 EPL بعدی را دریافت کنی."
-            )
-
         return (
             "⛏️ Mining timer finished!\n\n"
             "Your 1-hour cycle is complete. "
-            "Open the app and tap Claim 100 EPL."
+            "Open the app and tap Claim 100 EPL to receive your next 100 EPL."
         )
 
     @staticmethod
     def _empty_levels(row) -> list[int]:
-        """
-        فقط جایگاه‌هایی که هنوز پر نشده‌اند.
-        """
+        """Return only referral positions that are still incomplete."""
 
         return [
             level
@@ -135,9 +110,10 @@ class NotifierService:
 
     @staticmethod
     def _level_reward(level: int) -> int:
-        """
-        جایگاه اول = 1000 EPL
-        جایگاه‌های بعدی = 500 EPL
+        """Return the reward for a referral position.
+
+        Position 1 = 1,000 EPL.
+        Positions 2-5 = 500 EPL each.
         """
 
         if level == 1:
@@ -150,43 +126,6 @@ class NotifierService:
         empty_levels: list[int]
     ) -> str:
 
-        if self.settings.message_language == "fa":
-
-            lines = [
-                "🎯 جایگاه‌های خالی Referral شما",
-                "",
-                "هنوز جایگاه‌های زیر خالی هستند:",
-                "",
-            ]
-
-            for level in empty_levels:
-
-                reward = self._level_reward(level)
-
-                lines.append(
-                    f"▫️ جایگاه {level} "
-                    f"— پاداش {reward:,} EPL"
-                )
-
-            lines.extend(
-                [
-                    "",
-                    "👥 با دعوت دوستانت "
-                    "جایگاه‌های بالا را تکمیل کن.",
-                    "",
-                    "🎁 به محض تکمیل هر جایگاه، "
-                    "پاداش همان جایگاه را دریافت می‌کنی.",
-                    "",
-                    "✅ هر جایگاهی که تکمیل شود "
-                    "دیگر در Notification بعدی "
-                    "نمایش داده نمی‌شود.",
-                    "",
-                    "لینک دعوتت را برای دوستانت بفرست 👇",
-                ]
-            )
-
-            return "\n".join(lines)
-
         lines = [
             "🎯 Your empty referral positions",
             "",
@@ -195,21 +134,23 @@ class NotifierService:
         ]
 
         for level in empty_levels:
-
             reward = self._level_reward(level)
 
             lines.append(
                 f"▫️ Position {level} "
-                f"— reward {reward:,} EPL"
+                f"— Reward: {reward:,} EPL"
             )
 
         lines.extend(
             [
                 "",
-                "👥 Invite friends to complete them.",
+                "👥 Invite friends to complete these positions.",
                 "",
-                "✅ Completed positions disappear "
-                "from future notifications.",
+                "🎁 You receive the reward for each position as soon as it is completed.",
+                "",
+                "✅ Completed positions will no longer appear in future notifications.",
+                "",
+                "Share your referral link with your friends 👇",
             ]
         )
 
@@ -385,8 +326,7 @@ class NotifierService:
             )
 
             #
-            # اگر همه جایگاه‌ها پر شده باشند
-            # هیچ پیامی ارسال نشود
+            # Do not send a reminder when all referral positions are complete.
             #
             if not empty_levels:
                 continue

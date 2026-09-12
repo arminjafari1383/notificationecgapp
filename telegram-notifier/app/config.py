@@ -106,7 +106,7 @@ class Settings:
 
         lang = os.getenv(
             "MESSAGE_LANGUAGE",
-            "fa"
+            "en"
         ).strip().lower()
 
         if lang not in {"fa", "en"}:

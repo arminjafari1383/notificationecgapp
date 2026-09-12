@@ -17,9 +17,9 @@ async def main() -> None:
     try:
         result = await client.send_message(
             telegram_id,
-            "✅ سرویس Notification با موفقیت به ربات تلگرام وصل است.",
+            "✅ The notification service is successfully connected to the Telegram bot.",
             inline_keyboard=[[
-                {"text": "🚀 ورود به Mini App", "url": settings.mini_app_url}
+                {"text": "🚀 Open Mini App", "url": settings.mini_app_url}
             ]],
         )
         print(f"sent message_id={result.get('message_id')}")
