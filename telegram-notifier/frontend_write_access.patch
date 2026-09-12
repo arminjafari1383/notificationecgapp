@@ -1,0 +1,27 @@
+--- a/frontend/src/pages/Timer.jsx
++++ b/frontend/src/pages/Timer.jsx
+@@ -565,6 +565,24 @@
+     telegramRef.current = getTelegramWebApp();
+     const tg = telegramRef.current;
+ 
++    // Ask once for permission so the bot can send proactive timer/referral notifications.
++    // Telegram skips the prompt after permission has already been granted.
++    try {
++      const user = tg?.initDataUnsafe?.user;
++      if (
++        tg &&
++        typeof tg.requestWriteAccess === "function" &&
++        user &&
++        user.allows_write_to_pm !== true
++      ) {
++        tg.requestWriteAccess((allowed) => {
++          console.log("[Telegram] bot write access:", allowed);
++        });
++      }
++    } catch (error) {
++      console.warn("[Telegram] requestWriteAccess failed:", error);
++    }
++
+     // ✅ فقط یک بار ready و expand رو صدا بزن
+     if (tg) {
+       try {

@@ -1,0 +1,21 @@
+services:
+  telegram-notifier:
+    build: .
+    container_name: telegram-notifier
+    restart: unless-stopped
+    env_file:
+      - .env
+    ports:
+      - "5000:5000"
+    volumes:
+      - telegram_notifier_data:/data
+    networks:
+      - projectecg_network
+
+volumes:
+  telegram_notifier_data:
+
+networks:
+  projectecg_network:
+    external: true
+    name: ${DOCKER_NETWORK:-projectecg_default}
