@@ -56,8 +56,7 @@ class Settings:
 
     timer_poll_seconds: int
     referral_poll_seconds: int
-    referral_reminder_hour: int
-    referral_reminder_minute: int
+    referral_reminder_interval_hours: int
     batch_size: int
     send_delay_seconds: float
 
@@ -75,10 +74,21 @@ class Settings:
         if not token:
             raise ValueError("TELEGRAM_BOT_TOKEN is required")
 
-        bot_username = os.getenv("TELEGRAM_BOT_USERNAME", "Aipolynetbot").strip().lstrip("@")
-        short_name = os.getenv("MINI_APP_SHORT_NAME", "app").strip().strip("/")
+        bot_username = (
+            os.getenv("TELEGRAM_BOT_USERNAME", "Aipolynetbot")
+            .strip()
+            .lstrip("@")
+        )
+
+        short_name = (
+            os.getenv("MINI_APP_SHORT_NAME", "app")
+            .strip()
+            .strip("/")
+        )
+
         if not bot_username:
             raise ValueError("TELEGRAM_BOT_USERNAME is required")
+
         if not short_name:
             raise ValueError("MINI_APP_SHORT_NAME is required")
 
@@ -87,49 +97,128 @@ class Settings:
             f"https://t.me/{bot_username}/{short_name}",
         ).strip()
 
-        timezone_name = os.getenv("APP_TIMEZONE", "Asia/Tehran").strip()
-        ZoneInfo(timezone_name)  # validate early
+        timezone_name = os.getenv(
+            "APP_TIMEZONE",
+            "Asia/Tehran"
+        ).strip()
 
-        hour = _int("REFERRAL_REMINDER_HOUR", 12, 0)
-        minute = _int("REFERRAL_REMINDER_MINUTE", 0, 0)
-        if hour > 23:
-            raise ValueError("REFERRAL_REMINDER_HOUR must be 0..23")
-        if minute > 59:
-            raise ValueError("REFERRAL_REMINDER_MINUTE must be 0..59")
+        ZoneInfo(timezone_name)
 
-        lang = os.getenv("MESSAGE_LANGUAGE", "fa").strip().lower()
+        lang = os.getenv(
+            "MESSAGE_LANGUAGE",
+            "fa"
+        ).strip().lower()
+
         if lang not in {"fa", "en"}:
             raise ValueError("MESSAGE_LANGUAGE must be fa or en")
 
-        ssl_raw = os.getenv("POSTGRES_SSLMODE", "").strip().lower()
-        postgres_ssl = None if ssl_raw in {"", "disable", "false", "0"} else ssl_raw
+        ssl_raw = os.getenv(
+            "POSTGRES_SSLMODE",
+            ""
+        ).strip().lower()
+
+        postgres_ssl = (
+            None
+            if ssl_raw in {"", "disable", "false", "0"}
+            else ssl_raw
+        )
 
         return cls(
             telegram_bot_token=token,
             telegram_bot_username=bot_username,
             mini_app_short_name=short_name,
             mini_app_url=mini_app_url,
-            postgres_host=os.getenv("POSTGRES_HOST", "db").strip(),
-            postgres_port=_int("POSTGRES_PORT", 5432, 1),
-            postgres_db=os.getenv("POSTGRES_DB", "mydb").strip(),
-            postgres_user=os.getenv("POSTGRES_USER", "user").strip(),
-            postgres_password=os.getenv("POSTGRES_PASSWORD", "pass"),
+
+            postgres_host=os.getenv(
+                "POSTGRES_HOST",
+                "db"
+            ).strip(),
+
+            postgres_port=_int(
+                "POSTGRES_PORT",
+                5432,
+                1
+            ),
+
+            postgres_db=os.getenv(
+                "POSTGRES_DB",
+                "mydb"
+            ).strip(),
+
+            postgres_user=os.getenv(
+                "POSTGRES_USER",
+                "user"
+            ).strip(),
+
+            postgres_password=os.getenv(
+                "POSTGRES_PASSWORD",
+                "pass"
+            ),
+
             postgres_ssl=postgres_ssl,
+
             appuser_table=_safe_sql_identifier(
-                "APPUSER_TABLE", os.getenv("APPUSER_TABLE", "core_appuser").strip()
+                "APPUSER_TABLE",
+                os.getenv(
+                    "APPUSER_TABLE",
+                    "core_appuser"
+                ).strip()
             ),
+
             referral_table=_safe_sql_identifier(
-                "REFERRAL_TABLE", os.getenv("REFERRAL_TABLE", "core_referrallevel").strip()
+                "REFERRAL_TABLE",
+                os.getenv(
+                    "REFERRAL_TABLE",
+                    "core_referrallevel"
+                ).strip()
             ),
-            state_db_path=os.getenv("STATE_DB_PATH", "/data/notifier.sqlite3").strip(),
+
+            state_db_path=os.getenv(
+                "STATE_DB_PATH",
+                "/data/notifier.sqlite3"
+            ).strip(),
+
             timezone_name=timezone_name,
-            timer_poll_seconds=_int("TIMER_POLL_SECONDS", 30, 5),
-            referral_poll_seconds=_int("REFERRAL_POLL_SECONDS", 60, 10),
-            referral_reminder_hour=hour,
-            referral_reminder_minute=minute,
-            batch_size=_int("DB_BATCH_SIZE", 500, 1),
-            send_delay_seconds=_float("SEND_DELAY_SECONDS", 0.06, 0.0),
-            enable_timer_notifications=_bool("ENABLE_TIMER_NOTIFICATIONS", True),
-            enable_referral_reminders=_bool("ENABLE_REFERRAL_REMINDERS", True),
+
+            timer_poll_seconds=_int(
+                "TIMER_POLL_SECONDS",
+                30,
+                5
+            ),
+
+            referral_poll_seconds=_int(
+                "REFERRAL_POLL_SECONDS",
+                60,
+                10
+            ),
+
+            referral_reminder_interval_hours=_int(
+                "REFERRAL_REMINDER_INTERVAL_HOURS",
+                5,
+                1
+            ),
+
+            batch_size=_int(
+                "DB_BATCH_SIZE",
+                500,
+                1
+            ),
+
+            send_delay_seconds=_float(
+                "SEND_DELAY_SECONDS",
+                0.06,
+                0.0
+            ),
+
+            enable_timer_notifications=_bool(
+                "ENABLE_TIMER_NOTIFICATIONS",
+                True
+            ),
+
+            enable_referral_reminders=_bool(
+                "ENABLE_REFERRAL_REMINDERS",
+                True
+            ),
+
             message_language=lang,
         )
