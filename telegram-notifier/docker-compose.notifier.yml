@@ -4,7 +4,7 @@ services:
     container_name: telegram-notifier
     restart: unless-stopped
     env_file:
-      - .env
+      - .env.example
     ports:
       - "5000:5000"
     volumes:
